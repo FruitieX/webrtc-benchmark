@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014 Aalto University
+ * Copyright (c) 2014 Rasmus Eskola
+ * Licensed under the MIT License, see LICENSE for more information.
+ */
+
 var serverConnect = function() {
 	return new Peer('server', {
 		host: 'fruitiex.org',

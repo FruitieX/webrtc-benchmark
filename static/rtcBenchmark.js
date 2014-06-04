@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2014 Aalto University
+ * Copyright (c) 2014 Rasmus Eskola
+ * Licensed under the MIT License, see LICENSE for more information.
+ */
+
 var serverCnt = 50; // how many times we connect to the server
 var peerListCnt = 400; // how many samples to collect
 var peerConnectCnt = 100; // how many samples to collect
