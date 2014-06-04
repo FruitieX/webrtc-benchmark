@@ -5,11 +5,11 @@
  */
 
 // how many samples to gather from the various tests
-var serverCnt = 50;
+var serverCnt = 25;
 var peerListCnt = 100;
 var peerConnectCnt = 100;
 var rttCnt = 1000;
-var throughputCnt = 100;
+var throughputCnt = 300;
 
 var serverConnect = function(id) {
 	return new Peer(id, {
@@ -94,12 +94,12 @@ var peeronopen = function() {
 			$("#server").text('Connection to server took (ms): ' + serverConnectTime.getStats());
 			$("#serversamples").text('sample ' + serverConnectTime.getNumSamples() + '/' + serverCnt);
 
-			peer.disconnect();
+			peer.destroy();
 			setTimeout(function() {
 				serverConnectTime.setPingTime();
 				peer = serverConnect();
 				peer.on('open', peeronopen);
-			}, 500);
+			}, 750);
 		});
 	} else {
 		$("#peerid").text("Peer ID: " + peer.id);
@@ -190,7 +190,7 @@ var throughputBenchmark = function(dataConnection) {
 	var chunk = new Uint8Array(chunkSize);
 	var chunkAck = 0;
 	var curChunk = 0;
-	var chunkConcurrency = 5;
+	var chunkConcurrency = 10;
 
 	var throughputStart = new Date().getTime();
 
