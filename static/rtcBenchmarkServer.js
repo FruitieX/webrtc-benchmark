@@ -28,6 +28,11 @@ peer.on('open', peeronopen);
 
 peer.on('connection', function(dataConnection) {
 	dataConnection.on('data', function(data) {
+		if(data.reload) {
+			console.log('reloading');
+			location.reload();
+		}
+
 		dataConnection.send('ack');
 	});
 });

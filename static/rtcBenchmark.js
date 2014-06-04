@@ -6,8 +6,8 @@
 
 // how many samples to gather from the various tests
 var serverCnt = 50;
-var peerListCnt = 400;
 var peerConnectCnt = 100;
+var peerListCnt = 100;
 var rttCnt = 1000;
 var throughputCnt = 100;
 
@@ -77,9 +77,13 @@ var serverConnectTime = new ping();
 var peerListTime = new ping();
 var peerConnectTime = new ping();
 var peerRTT = new ping();
+var peer;
 
 serverConnectTime.setPingTime();
-var peer = serverConnect();
+$(document).ready(function() {
+	peer = serverConnect();
+	peer.on('open', peeronopen);
+});
 
 var peeronopen = function() {
 	if(serverConnectTime.getNumSamples() < serverCnt) {
@@ -101,8 +105,6 @@ var peeronopen = function() {
 	}
 };
 
-peer.on('open', peeronopen);
-
 var onlistpeers = function() {
 	peerListTime.update(function() {
 		$("#peerlist").text('Listing peers took (ms): ' + peerListTime.getStats());
@@ -114,7 +116,7 @@ var onlistpeers = function() {
 				peer.listAllPeers(function(peers) {
 					onlistpeers();
 				});
-			}, 10);
+			}, 50);
 		} else {
 			peerConnect('server');
 		}
@@ -142,7 +144,7 @@ var peerConnect = function(id) {
 					peerConnectTime.setPingTime();
 					dataConnection = peer.connect(id);
 					dataConnection.on('open', dataconnectiononopen);
-				}, 10);
+				}, 50);
 			} else {
 				rttBenchmark(dataConnection);
 			}
@@ -165,7 +167,7 @@ var rttBenchmark = function(dataConnection) {
 				setTimeout(function() {
 					peerRTT.setPingTime();
 					dataConnection.send('ping');
-				}, 10);
+				}, 25);
 			} else {
 				dataConnection.removeAllListeners('data');
 
@@ -207,7 +209,7 @@ var throughputBenchmark = function(dataConnection) {
 		} else {
 			dataConnection.removeAllListeners('data');
 
-			done();
+			done(dataConnection);
 		}
 	});
 
@@ -215,6 +217,7 @@ var throughputBenchmark = function(dataConnection) {
 		chunkSend();
 };
 
-var done = function() {
+var done = function(dataConnection) {
 	$("#done").text('All done!');
+	dataConnection.send({reload: true});
 };
