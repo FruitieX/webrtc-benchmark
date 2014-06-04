@@ -190,7 +190,7 @@ var throughputBenchmark = function(dataConnection) {
 	var chunk = new Uint8Array(chunkSize);
 	var chunkAck = 0;
 	var curChunk = 0;
-	var chunkConcurrency = 5;
+	var chunkConcurrency = 3;
 
 	var throughputStart = new Date().getTime();
 
