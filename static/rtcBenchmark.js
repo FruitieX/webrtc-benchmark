@@ -79,10 +79,10 @@ var peerConnectTime = new ping();
 var peerRTT = new ping();
 var peer;
 
-serverConnectTime.setPingTime();
 $(document).ready(function() {
 	// wait a little more
 	setTimeout(function() {
+		serverConnectTime.setPingTime();
 		peer = serverConnect();
 		peer.on('open', peeronopen);
 	}, 1000);
