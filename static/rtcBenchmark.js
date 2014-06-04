@@ -5,10 +5,8 @@
  */
 
 // how many samples to gather from the various tests
-//var serverCnt = 50;
-//var peerConnectCnt = 100;
-var serverCnt = 1;
-var peerListCnt = 1;
+var serverCnt = 50;
+var peerListCnt = 100;
 var peerConnectCnt = 100;
 var rttCnt = 1000;
 var throughputCnt = 100;
