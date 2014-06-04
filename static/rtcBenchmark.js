@@ -4,18 +4,11 @@
  * Licensed under the MIT License, see LICENSE for more information.
  */
 
-/*
-// how many times we connect to the server
+// how many samples to gather from the various tests
 var serverCnt = 50;
 var peerListCnt = 400;
 var peerConnectCnt = 100;
 var rttCnt = 1000;
-*/
-// testing
-var serverCnt = 1; // how many times we connect to the server
-var peerListCnt = 1; // how many samples to collect
-var peerConnectCnt = 1; // how many samples to collect
-var rttCnt = 1; // how many samples to collect
 var throughputCnt = 100;
 
 var serverConnect = function(id) {
