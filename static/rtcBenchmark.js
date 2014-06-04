@@ -5,9 +5,11 @@
  */
 
 // how many samples to gather from the various tests
-var serverCnt = 50;
+//var serverCnt = 50;
+//var peerConnectCnt = 100;
+var serverCnt = 1;
+var peerListCnt = 1;
 var peerConnectCnt = 100;
-var peerListCnt = 100;
 var rttCnt = 1000;
 var throughputCnt = 100;
 
@@ -147,7 +149,7 @@ var peerConnect = function(id) {
 					peerConnectTime.setPingTime();
 					dataConnection = peer.connect(id);
 					dataConnection.on('open', dataconnectiononopen);
-				}, 50);
+				}, 200);
 			} else {
 				rttBenchmark(dataConnection);
 			}
