@@ -81,8 +81,11 @@ var peer;
 
 serverConnectTime.setPingTime();
 $(document).ready(function() {
-	peer = serverConnect();
-	peer.on('open', peeronopen);
+	// wait a little more
+	setTimeout(function() {
+		peer = serverConnect();
+		peer.on('open', peeronopen);
+	}, 1000);
 });
 
 var peeronopen = function() {
