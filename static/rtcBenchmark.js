@@ -4,10 +4,19 @@
  * Licensed under the MIT License, see LICENSE for more information.
  */
 
-var serverCnt = 50; // how many times we connect to the server
-var peerListCnt = 400; // how many samples to collect
-var peerConnectCnt = 100; // how many samples to collect
-var rttCnt = 1000; // how many samples to collect
+/*
+// how many times we connect to the server
+var serverCnt = 50;
+var peerListCnt = 400;
+var peerConnectCnt = 100;
+var rttCnt = 1000;
+*/
+// testing
+var serverCnt = 1; // how many times we connect to the server
+var peerListCnt = 1; // how many samples to collect
+var peerConnectCnt = 1; // how many samples to collect
+var rttCnt = 1; // how many samples to collect
+var throughputCnt = 100;
 
 var serverConnect = function(id) {
 	return new Peer(id, {
@@ -167,7 +176,7 @@ var rttBenchmark = function(dataConnection) {
 			} else {
 				dataConnection.removeAllListeners('data');
 
-				done(dataConnection);
+				throughputBenchmark(dataConnection);
 			}
 		});
 	});
@@ -176,6 +185,43 @@ var rttBenchmark = function(dataConnection) {
 	dataConnection.send('ping');
 };
 
-var done = function(dataConnection) {
+var throughputBenchmark = function(dataConnection) {
+	dataConnection.removeAllListeners('data');
+
+	var chunkSize = 1024 * 1024;
+	var chunk = new Uint8Array(chunkSize);
+	var chunkAck = 0;
+	var curChunk = 0;
+	var chunkConcurrency = 5;
+
+	var throughputStart = new Date().getTime();
+
+	var chunkSend = function() {
+		curChunk++;
+		dataConnection.send(chunk);
+	}
+
+	dataConnection.on('data', function(data) {
+		chunkAck++;
+
+		$("#throughput").text('Data throughput to peer (MB/s): ' +
+			Math.round(100 * (chunkAck
+			/ ((new Date().getTime() - throughputStart) / 1000))) / 100);
+		$("#throughputsamples").text('sample ' + curChunk + '/' + throughputCnt);
+
+		if(curChunk < throughputCnt) {
+			chunkSend();
+		} else {
+			dataConnection.removeAllListeners('data');
+
+			done();
+		}
+	});
+
+	for (var i = 0; i < chunkConcurrency; i++)
+		chunkSend();
+};
+
+var done = function() {
 	$("#done").text('All done!');
 };
