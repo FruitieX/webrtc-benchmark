@@ -119,7 +119,7 @@ var onlistpeers = function() {
 				peer.listAllPeers(function(peers) {
 					onlistpeers();
 				});
-			}, 50);
+			}, 100);
 		} else {
 			peerConnect('server');
 		}
