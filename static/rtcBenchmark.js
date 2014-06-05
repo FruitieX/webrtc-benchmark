@@ -9,7 +9,7 @@ var serverCnt = 25;
 var peerListCnt = 100;
 var peerConnectCnt = 50;
 var rttCnt = 1000;
-var throughputCnt = 300;
+var throughputTime = 60 * 1000; // a minute
 
 var serverConnect = function(id) {
 	return new Peer(id, {
@@ -134,16 +134,17 @@ var peerList = function() {
 };
 
 var peerConnect = function(id) {
+	peerConnectTime.setPingTime();
 	var dataConnection = peer.connect(id);
 
 	var dataconnectiononopen = function() {
 		peerConnectTime.update(function() {
+			dataConnection.close();
 			$("#peerconnect").text('Connecting to peer took (ms): ' + peerConnectTime.getStats());
 			$("#peerconnectsamples").text('sample ' + peerConnectTime.getNumSamples() + '/' + peerConnectCnt);
 
 			if(peerConnectTime.getNumSamples() < peerConnectCnt) {
 				setTimeout(function() {
-					dataConnection.close();
 					peerConnectTime.setPingTime();
 					dataConnection = peer.connect(id);
 					dataConnection.on('open', dataconnectiononopen);
@@ -154,7 +155,6 @@ var peerConnect = function(id) {
 		});
 	};
 
-	peerConnectTime.setPingTime();
 	dataConnection.on('open', dataconnectiononopen);
 };
 
@@ -205,19 +205,25 @@ var throughputBenchmark = function(dataConnection) {
 		$("#throughput").text('Data throughput to peer (MB/s): ' +
 			Math.round(100 * (chunkAck
 			/ ((new Date().getTime() - throughputStart) / 1000))) / 100);
-		$("#throughputsamples").text('sample ' + curChunk + '/' + throughputCnt);
 
-		if(curChunk < throughputCnt) {
-			chunkSend();
-		} else {
-			dataConnection.removeAllListeners('data');
-
-			done(dataConnection);
-		}
+		// send more data
+		chunkSend();
 	});
 
 	for (var i = 0; i < chunkConcurrency; i++)
 		chunkSend();
+
+	var throughputUpdateTimer = setInterval(function() {
+		$("#throughputsamples").text('seconds left: ' +
+			Math.round(throughputTime - (new Date().getTime() - throughputStart)));
+	}, 1000);
+
+	setTimeout(function() {
+		dataConnection.removeAllListeners('data');
+		clearInterval(throughputUpdateTimer);
+
+		done(dataConnection);
+	}, throughputTime);
 };
 
 var done = function(dataConnection) {
