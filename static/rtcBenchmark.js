@@ -91,8 +91,8 @@ $(document).ready(function() {
 var peeronopen = function() {
 	if(serverConnectTime.getNumSamples() < serverCnt) {
 		serverConnectTime.update(function() {
-			$("#server").text('Connection to server took (ms): ' + serverConnectTime.getStats());
-			$("#serversamples").text('sample ' + serverConnectTime.getNumSamples() + '/' + serverCnt);
+			$("#server").text(serverConnectTime.getStats());
+			$("#samples").text('sample ' + serverConnectTime.getNumSamples() + '/' + serverCnt);
 
 			peer.destroy();
 			setTimeout(function() {
@@ -103,7 +103,7 @@ var peeronopen = function() {
 		});
 	} else {
 		$("#peerid").text("Peer ID: " + peer.id);
-		$("#serversamples").empty();
+		$("#samples").empty();
 
 		peerList();
 	}
@@ -111,8 +111,8 @@ var peeronopen = function() {
 
 var onlistpeers = function() {
 	peerListTime.update(function() {
-		$("#peerlist").text('Listing peers took (ms): ' + peerListTime.getStats());
-		$("#peerlistsamples").text('sample ' + peerListTime.getNumSamples() + '/' + peerListCnt);
+		$("#peerlist").text(peerListTime.getStats());
+		$("#samples").text('sample ' + peerListTime.getNumSamples() + '/' + peerListCnt);
 
 		if(peerListTime.getNumSamples() < peerListCnt) {
 			setTimeout(function() {
@@ -122,7 +122,7 @@ var onlistpeers = function() {
 				});
 			}, 100);
 		} else {
-			$("#peerlistsamples").empty();
+			$("#samples").empty();
 			peerConnect('server');
 		}
 	});
@@ -141,8 +141,8 @@ var peerConnect = function(id) {
 
 	var dataconnectiononopen = function() {
 		peerConnectTime.update(function() {
-			$("#peerconnect").text('Connecting to peer took (ms): ' + peerConnectTime.getStats());
-			$("#peerconnectsamples").text('sample ' + peerConnectTime.getNumSamples() + '/' + peerConnectCnt);
+			$("#peerconnect").text(peerConnectTime.getStats());
+			$("#samples").text('sample ' + peerConnectTime.getNumSamples() + '/' + peerConnectCnt);
 
 			if(peerConnectTime.getNumSamples() < peerConnectCnt) {
 				setTimeout(function() {
@@ -153,7 +153,7 @@ var peerConnect = function(id) {
 					dataConnection.on('open', dataconnectiononopen);
 				}, 1000);
 			} else {
-				$("#peerconnectsamples").empty();
+				$("#samples").empty();
 				rttBenchmark(dataConnection);
 			}
 		});
@@ -167,8 +167,8 @@ var rttBenchmark = function(dataConnection) {
 
 	dataConnection.on('data', function(data) {
 		peerRTT.update(function() {
-			$("#rtt").text('RTT to peer (ms): ' + peerRTT.getStats());
-			$("#rttsamples").text('sample ' + peerRTT.getNumSamples() + '/' + rttCnt);
+			$("#rtt").text(peerRTT.getStats());
+			$("#samples").text('sample ' + peerRTT.getNumSamples() + '/' + rttCnt);
 
 			if(peerRTT.getNumSamples() < rttCnt) {
 				setTimeout(function() {
@@ -177,7 +177,7 @@ var rttBenchmark = function(dataConnection) {
 				}, 25);
 			} else {
 				dataConnection.removeAllListeners('data');
-				$("#rttsamples").empty();
+				$("#samples").empty();
 
 				throughputBenchmark(dataConnection);
 			}
@@ -207,7 +207,7 @@ var throughputBenchmark = function(dataConnection) {
 	dataConnection.on('data', function(data) {
 		chunkAck++;
 
-		$("#throughput").text('Data throughput to peer (MB/s): ' +
+		$("#throughput").text(
 			Math.round(100 * (chunkAck
 			/ ((new Date().getTime() - throughputStart) / 1000))) / 100);
 
@@ -219,14 +219,14 @@ var throughputBenchmark = function(dataConnection) {
 		chunkSend();
 
 	var throughputUpdateTimer = setInterval(function() {
-		$("#throughputsamples").text('seconds left: ' +
+		$("#samples").text('seconds left: ' +
 			Math.floor((throughputTime - (new Date().getTime() - throughputStart)) / 1000));
 	}, 1000);
 
 	setTimeout(function() {
 		dataConnection.removeAllListeners('data');
 		clearInterval(throughputUpdateTimer);
-		$("#throughputsamples").empty();
+		$("#samples").empty();
 		done(dataConnection);
 	}, throughputTime);
 };

@@ -9,17 +9,26 @@
 	<body>
 		<div id="peerid"></div>
 		<br>
-		<div id="server"></div>
-		<div id="serversamples"></div>
-		<div id="peerlist"></div>
-		<div id="peerlistsamples"></div>
-		<div id="peerconnect"></div>
-		<div id="peerconnectsamples"></div>
-		<div id="rtt"></div>
-		<div id="rttsamples"></div>
-		<div id="throughput"></div>
-		<div id="throughputsamples"></div>
+		<table>
+			<tr>
+				<td>Connection to server took (ms):</td>
+				<td><div id="server"></div></td>
+			</tr><tr>
+				<td>Listing peers took (ms):</td>
+				<td><div id="peerlist"></div></td>
+			</tr><tr>
+				<td>Connecting to peer took (ms):</td>
+				<td><div id="peerconnect"></div></td>
+			</tr><tr>
+				<td>RTT to peer (ms):</td>
+				<td><div id="rtt"></div></td>
+			</tr><tr>
+				<td>Data throughput to peer (MB/s):</td>
+				<td><div id="throughput"></div></td>
+			</tr>
+		</table>
 		<br>
+		<div id="samples"></div>
 		<div id="done"></div>
 	</body>
 </html>
