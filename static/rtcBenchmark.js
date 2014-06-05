@@ -7,7 +7,7 @@
 // how many samples to gather from the various tests
 var serverCnt = 25;
 var peerListCnt = 100;
-var peerConnectCnt = 50;
+var peerConnectCnt = 25;
 var rttCnt = 1000;
 var throughputTime = 60 * 1000; // a minute
 
@@ -103,6 +103,7 @@ var peeronopen = function() {
 		});
 	} else {
 		$("#peerid").text("Peer ID: " + peer.id);
+		$("#serversamples").empty();
 
 		peerList();
 	}
@@ -121,6 +122,7 @@ var onlistpeers = function() {
 				});
 			}, 100);
 		} else {
+			$("#peerlistsamples").empty();
 			peerConnect('server');
 		}
 	});
@@ -139,17 +141,19 @@ var peerConnect = function(id) {
 
 	var dataconnectiononopen = function() {
 		peerConnectTime.update(function() {
-			dataConnection.close();
 			$("#peerconnect").text('Connecting to peer took (ms): ' + peerConnectTime.getStats());
 			$("#peerconnectsamples").text('sample ' + peerConnectTime.getNumSamples() + '/' + peerConnectCnt);
 
 			if(peerConnectTime.getNumSamples() < peerConnectCnt) {
 				setTimeout(function() {
+					dataConnection.close();
+
 					peerConnectTime.setPingTime();
 					dataConnection = peer.connect(id);
 					dataConnection.on('open', dataconnectiononopen);
 				}, 1000);
 			} else {
+				$("#peerconnectsamples").empty();
 				rttBenchmark(dataConnection);
 			}
 		});
@@ -173,6 +177,7 @@ var rttBenchmark = function(dataConnection) {
 				}, 25);
 			} else {
 				dataConnection.removeAllListeners('data');
+				$("#rttsamples").empty();
 
 				throughputBenchmark(dataConnection);
 			}
@@ -215,13 +220,13 @@ var throughputBenchmark = function(dataConnection) {
 
 	var throughputUpdateTimer = setInterval(function() {
 		$("#throughputsamples").text('seconds left: ' +
-			Math.round(throughputTime - (new Date().getTime() - throughputStart)));
+			Math.floor((throughputTime - (new Date().getTime() - throughputStart)) / 1000));
 	}, 1000);
 
 	setTimeout(function() {
 		dataConnection.removeAllListeners('data');
 		clearInterval(throughputUpdateTimer);
-
+		$("#throughputsamples").empty();
 		done(dataConnection);
 	}, throughputTime);
 };

@@ -27,12 +27,7 @@ var peeronopen = function() {
 $("#peerid").text("Connecting...");
 peer.on('open', peeronopen);
 
-var previousDataConnection;
 peer.on('connection', function(dataConnection) {
-	if(previousDataConnection && previousDataConnection.close)
-		previousDataConnection.close();
-
-	previousDataConnection = dataConnection;
 	dataConnection.on('data', function(data) {
 		if(data.reload) {
 			console.log('reloading');
