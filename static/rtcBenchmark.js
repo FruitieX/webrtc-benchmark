@@ -26,12 +26,14 @@ var serverConnect = function(id) {
 };
 
 function ping() {
-	var avg = 0; var jitter = 0; var min = 999999999; var max = 0; var samples = 0;
+	var avg = 0; var stddev = 0;
+	var jitter = 0; var min = 999999999; var max = 0; var samples = 0;
 	var times = []; var jitters = [];
 	var pingTime;
 
 	this.getStats = function() {
-		return 'min: ' + min + ', max: ' + max + ', avg: ' + avg + ', jitter: ' + jitter;
+		return 'min: ' + min + ', max: ' + max + ', avg: ' + avg +
+			', stddev: ' + stddev + ', jitter: ' + jitter;
 	};
 
 	this.getNumSamples = function() {
@@ -60,7 +62,17 @@ function ping() {
 				max = times[i];
 		}
 		avg /= times.length;
+
+		// standard deviation
+		var tempSum = 0;
+		for(var i = 0; i < times.length; i++) {
+			tempSum += Math.pow(times[i] - avg, 2);
+		}
+		stddev = tempSum / times.length;
+		stddev = Math.sqrt(stddev);
+
 		avg = Math.round(avg * 100) / 100;
+		stddev = Math.round(stddev * 100) / 100;
 
 		if (jitters.length)
 			jitter /= jitters.length;
