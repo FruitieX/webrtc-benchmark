@@ -5,15 +5,15 @@
  */
 
 // how many samples to gather from the various tests
-var serverCnt = 25;
-var peerListCnt = 100;
-var peerConnectCnt = 25;
-var rttCnt = 1000;
-var throughputTime = 60 * 1000; // a minute
+var serverCnt = 50;
+var peerListCnt = 200;
+var peerConnectCnt = 50;
+var rttCnt = 3000;
+var throughputTime = 120 * 1000; // three minutes
 
 var serverConnect = function(id) {
 	return new Peer(id, {
-		host: 'fruitiex.org',
+		host: '192.168.1.248',
 		port: '16472',
 		path: '/peer',
 		config: {
@@ -32,8 +32,8 @@ function ping() {
 	var pingTime;
 
 	this.getStats = function() {
-		return 'min: ' + min + ', max: ' + max + ', avg: ' + avg +
-			', stddev: ' + stddev + ', jitter: ' + jitter;
+		return '<td>' + avg + '</td><td>' + min + '</td><td>' + max +
+			'</td><td>' + stddev + '</td><td>' + jitter + '</td>';
 	};
 
 	this.getNumSamples = function() {
@@ -103,7 +103,7 @@ $(document).ready(function() {
 var peeronopen = function() {
 	if(serverConnectTime.getNumSamples() < serverCnt) {
 		serverConnectTime.update(function() {
-			$("#server").text(serverConnectTime.getStats());
+			$("#server").html('<td>Connection to server took (ms)</td>' + serverConnectTime.getStats());
 			$("#samples").text('sample ' + serverConnectTime.getNumSamples() + '/' + serverCnt);
 
 			peer.destroy();
@@ -123,7 +123,7 @@ var peeronopen = function() {
 
 var onlistpeers = function() {
 	peerListTime.update(function() {
-		$("#peerlist").text(peerListTime.getStats());
+		$("#peerlist").html('<td>Listing peers took (ms)</td>' + peerListTime.getStats());
 		$("#samples").text('sample ' + peerListTime.getNumSamples() + '/' + peerListCnt);
 
 		if(peerListTime.getNumSamples() < peerListCnt) {
@@ -153,7 +153,7 @@ var peerConnect = function(id) {
 
 	var dataconnectiononopen = function() {
 		peerConnectTime.update(function() {
-			$("#peerconnect").text(peerConnectTime.getStats());
+			$("#peerconnect").html('<td>Connecting to peer took (ms)</td>' + peerConnectTime.getStats());
 			$("#samples").text('sample ' + peerConnectTime.getNumSamples() + '/' + peerConnectCnt);
 
 			if(peerConnectTime.getNumSamples() < peerConnectCnt) {
@@ -179,7 +179,7 @@ var rttBenchmark = function(dataConnection) {
 
 	dataConnection.on('data', function(data) {
 		peerRTT.update(function() {
-			$("#rtt").text(peerRTT.getStats());
+			$("#rtt").html('<td>RTT to peer (ms)</td>' + peerRTT.getStats());
 			$("#samples").text('sample ' + peerRTT.getNumSamples() + '/' + rttCnt);
 
 			if(peerRTT.getNumSamples() < rttCnt) {
@@ -207,7 +207,7 @@ var throughputBenchmark = function(dataConnection) {
 	var chunk = new Uint8Array(chunkSize);
 	var chunkAck = 0;
 	var curChunk = 0;
-	var chunkConcurrency = 3;
+	var chunkConcurrency = 2;
 
 	var throughputStart = new Date().getTime();
 
@@ -219,9 +219,9 @@ var throughputBenchmark = function(dataConnection) {
 	dataConnection.on('data', function(data) {
 		chunkAck++;
 
-		$("#throughput").text(
+		$("#throughput").html('<td>Data throughput to peer (MB/s)</td><td>' +
 			Math.round(100 * (chunkAck
-			/ ((new Date().getTime() - throughputStart) / 1000))) / 100);
+			/ ((new Date().getTime() - throughputStart) / 1000))) / 100 + '</td>');
 
 		// send more data
 		chunkSend();

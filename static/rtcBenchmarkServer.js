@@ -6,7 +6,7 @@
 
 var serverConnect = function() {
 	return new Peer('server', {
-		host: 'fruitiex.org',
+		host: '192.168.1.248',
 		port: '16472',
 		path: '/peer',
 		config: {
