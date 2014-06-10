@@ -9,7 +9,7 @@ var serverCnt = 50;
 var peerListCnt = 200;
 var peerConnectCnt = 50;
 var rttCnt = 3000;
-var throughputTime = 120 * 1000; // three minutes
+var MBCnt = 128; // how many MB to send in throughput test
 
 var serverConnect = function(id) {
 	return new Peer(id, {
@@ -203,44 +203,23 @@ var rttBenchmark = function(dataConnection) {
 var throughputBenchmark = function(dataConnection) {
 	dataConnection.removeAllListeners('data');
 
-	var chunkSize = 1024 * 1024;
+	var chunkSize = 1024 * 1024 * MBCnt;
 	var chunk = new Uint8Array(chunkSize);
-	var chunkAck = 0;
-	var curChunk = 0;
-	var chunkConcurrency = 2;
 
+	$("#throughput").html('<td>Measuring data throughput by sending ' + MBCnt + ' MB...</td>');
 	var throughputStart = new Date().getTime();
 
 	var chunkSend = function() {
-		curChunk++;
 		dataConnection.send(chunk);
 	}
 
 	dataConnection.on('data', function(data) {
-		chunkAck++;
-
 		$("#throughput").html('<td>Data throughput to peer (MB/s)</td><td>' +
-			Math.round(100 * (chunkAck
+			Math.round(100 * (MBCnt
 			/ ((new Date().getTime() - throughputStart) / 1000))) / 100 + '</td>');
-
-		// send more data
-		chunkSend();
-	});
-
-	for (var i = 0; i < chunkConcurrency; i++)
-		chunkSend();
-
-	var throughputUpdateTimer = setInterval(function() {
-		$("#samples").text('seconds left: ' +
-			Math.floor((throughputTime - (new Date().getTime() - throughputStart)) / 1000));
-	}, 1000);
-
-	setTimeout(function() {
-		dataConnection.removeAllListeners('data');
-		clearInterval(throughputUpdateTimer);
-		$("#samples").empty();
 		done(dataConnection);
-	}, throughputTime);
+	});
+	chunkSend();
 };
 
 var done = function(dataConnection) {
