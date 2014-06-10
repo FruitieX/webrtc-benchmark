@@ -149,7 +149,7 @@ var peerList = function() {
 
 var peerConnect = function(id) {
 	peerConnectTime.setPingTime();
-	var dataConnection = peer.connect(id);
+	var dataConnection = peer.connect(id, {reliable: true});
 
 	var dataconnectiononopen = function() {
 		peerConnectTime.update(function() {
