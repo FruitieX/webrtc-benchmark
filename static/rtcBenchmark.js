@@ -11,19 +11,32 @@ var peerConnectCnt = 50;
 var rttCnt = 3000;
 var MBCnt = 128; // how many MB to send in throughput test
 
-var serverConnect = function(id) {
-	return new Peer(id, {
-		host: '192.168.1.248',
-		port: '16472',
-		path: '/peer',
-		config: {
-			'iceServers': [
-				{ url: 'stun:stun.l.google.com:19302' },
-				{ url: 'turn:fruitiex.org:3478', username: "rasse", credential: 'foobar' }
-			]
-		}
-	});
+var startTests = function() {
+	serverConnectTime.setPingTime();
+	peer = serverConnect();
+	peer.on('open', peeronopen);
 };
+
+var manualTests = true;
+var nextTest = startTests;
+var nextTestArgs = null;
+
+if (manualTests) {
+	$(document).ready(function() {
+		$("#button").append("<button id=\"nextTest\" type=\"button\">Run next test</button>");
+		$("#nextTest").click(function() {
+			nextTest.apply(null, nextTestArgs);
+			$("#nextTest").prop('disabled', true);
+		});
+	});
+} else {
+	$(document).ready(function() {
+		// wait a little more
+		setTimeout(function() {
+			startTests();
+		}, 1000);
+	});
+}
 
 function ping() {
 	var avg = 0; var stddev = 0;
@@ -86,19 +99,24 @@ function ping() {
 };
 
 var serverConnectTime = new ping();
+var serverConnect = function(id) {
+	return new Peer(id, {
+		host: '192.168.1.248',
+		port: '16472',
+		path: '/peer',
+		config: {
+			'iceServers': [
+				{ url: 'stun:stun.l.google.com:19302' },
+				{ url: 'turn:fruitiex.org:3478', username: "rasse", credential: 'foobar' }
+			]
+		}
+	});
+};
+
 var peerListTime = new ping();
 var peerConnectTime = new ping();
 var peerRTT = new ping();
 var peer;
-
-$(document).ready(function() {
-	// wait a little more
-	setTimeout(function() {
-		serverConnectTime.setPingTime();
-		peer = serverConnect();
-		peer.on('open', peeronopen);
-	}, 1000);
-});
 
 var peeronopen = function() {
 	if(serverConnectTime.getNumSamples() < serverCnt) {
@@ -114,10 +132,17 @@ var peeronopen = function() {
 			}, 750);
 		});
 	} else {
+		// done
 		$("#peerid").text("Peer ID: " + peer.id);
 		$("#samples").empty();
 
-		peerList();
+		if(manualTests) {
+			nextTest = peerList;
+			nextTestArgs = null;
+			$("#nextTest").prop('disabled', false);
+		} else {
+			peerList();
+		}
 	}
 };
 
@@ -134,8 +159,16 @@ var onlistpeers = function() {
 				});
 			}, 100);
 		} else {
+			// done
 			$("#samples").empty();
-			peerConnect('server');
+
+			if(manualTests) {
+				nextTest = peerConnect;
+				nextTestArgs = ['server'];
+				$("#nextTest").prop('disabled', false);
+			} else {
+				peerConnect('server');
+			}
 		}
 	});
 };
@@ -165,8 +198,16 @@ var peerConnect = function(id) {
 					dataConnection.on('open', dataconnectiononopen);
 				}, 1000);
 			} else {
+				// done
 				$("#samples").empty();
-				rttBenchmark(dataConnection);
+
+				if(manualTests) {
+					nextTest = rttBenchmark;
+					nextTestArgs = [dataConnection];
+					$("#nextTest").prop('disabled', false);
+				} else {
+					rttBenchmark(dataConnection);
+				}
 			}
 		});
 	};
@@ -188,10 +229,17 @@ var rttBenchmark = function(dataConnection) {
 					dataConnection.send('ping');
 				}, 25);
 			} else {
+				// done
 				dataConnection.removeAllListeners('data');
 				$("#samples").empty();
 
-				throughputBenchmark(dataConnection);
+				if(manualTests) {
+					nextTest = throughputBenchmark;
+					nextTestArgs = [dataConnection];
+					$("#nextTest").prop('disabled', false);
+				} else {
+					throughputBenchmark(dataConnection);
+				}
 			}
 		});
 	});
@@ -217,6 +265,8 @@ var throughputBenchmark = function(dataConnection) {
 		$("#throughput").html('<td>Data throughput to peer (MB/s)</td><td>' +
 			Math.round(100 * (MBCnt
 			/ ((new Date().getTime() - throughputStart) / 1000))) / 100 + '</td>');
+
+		// done
 		done(dataConnection);
 	});
 	chunkSend();
