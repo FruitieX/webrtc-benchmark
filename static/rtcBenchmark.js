@@ -5,10 +5,10 @@
  */
 
 // how many samples to gather from the various tests
-var serverCnt = 50;
-var peerListCnt = 200;
-var peerConnectCnt = 50;
-var rttCnt = 3000;
+var serverCnt = 1;
+var peerListCnt = 1;
+var peerConnectCnt = 1;
+var rttCnt = 1;
 var MBCnt = 128; // how many MB to send in throughput test
 
 var startTests = function() {
